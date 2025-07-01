@@ -1,0 +1,41 @@
+{
+    "admin": {
+        "password": "123",
+        "role": "admin"
+    },
+    "abc": {
+        "password": "123",
+        "role": "user"
+    },
+    "def": {
+        "password": "234",
+        "role": "user"
+    },
+    "dish": {
+        "role": "1",
+        "password": "123"
+    },
+    "sach": {
+        "role": "admin",
+        "password": "123"
+    },
+    "pqr": {
+        "password": "123",
+        "role": "user"
+    },
+    "cde": {
+        "password": "123",
+        "role": "user",
+        "registered_date": "07/01/2025 05:35PM"
+    },
+    "asd": {
+        "password": "123",
+        "role": "user",
+        "registered_date": "07/01/2025 05:47PM"
+    },
+    "1": {
+        "password": "a",
+        "role": "user",
+        "registered_date": "07/01/2025 06:34PM"
+    }
+}
