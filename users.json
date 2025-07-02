@@ -37,5 +37,20 @@
         "password": "a",
         "role": "user",
         "registered_date": "07/01/2025 06:34PM"
+    },
+    "sachi": {
+        "role": "user",
+        "password": "1234",
+        "registered_date": "07/02/2025 09:02:34 PM"
+    },
+    "lmn": {
+        "role": "user",
+        "password": "123",
+        "registered_date": "07/02/2025 09:05:41 PM"
+    },
+    "ccc": {
+        "password": "123",
+        "role": "user",
+        "registered_date": "07/02/2025 09:48PM"
     }
 }

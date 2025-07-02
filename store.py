@@ -47,18 +47,18 @@ class Store():
             self.current_user = {"username": username, "role": user['role']}
             self.user_menu()
         else:
-            print("\033[31mInvalid Username or Password. Please try again!\033[0m")
+            print("\n\033[31mInvalid Username or Password. Please try again!\033[0m")
 
     # Register New User Function
     def register_new_user(self):
         print("\n\033[1;95m---------- Register Page ----------\033[0m")
-        username = input("\nEnter Username : ")
+        username = input("\n\033[1mEnter Username : \033[0m")
 
         if username in self.users:
             print("\n\033[31mUsername Already Exists.\033[0m")
             return
 
-        password = input("Enter Password: ")
+        password = input("\033[1;34mEnter Password: \033[0m")
 
         self.users[username] = {
             "password": password,
@@ -77,7 +77,7 @@ class Store():
 
     # Display Main Menu
     def main_menu(self):
-        print("\n\033[1;95m---------- Welcome to the Sakura Clothing Store ----------\033[0m")
+        print("\n\033[1;95m==========  🛍️ Welcome to the Sakura Clothing Store 🛍️  ️==========\033[0m")
         print("\n\033[1mPlease select from the following options:\033[0m")
         print("\t1. Login")
         print("\t2. Register")
@@ -99,7 +99,7 @@ class Store():
     def user_menu(self):
         role = self.current_user['role']
 
-        print(f'\n\033[1;95m---------- {role.title()} Menu Page ----------\033[0m')
+        print(f'\n\033[1;95m---------- {role.title()} Menu Page ----------\033[0m\n')
         if role == "user":
             print("\t1. View Catalog")
             print("\t2. Search")
@@ -141,7 +141,7 @@ class Store():
                 # After Returning Items, Return back to the User Menu
                 self.user_menu()
             elif choice == "8":
-                print("\nLogging out... \nReturning to Main Menu...")
+                print("\n\033[33mLogging out... \nReturning to Main Menu...\033[0m")
                 self.main_menu()
             else:
                 print("\n\033[31mSorry, invalid option. Please try again.\033[0m")
@@ -177,7 +177,7 @@ class Store():
                 elif admin_choice == "8":
                     self.admin.monitor_stock()
                 elif admin_choice == "9":
-                    print("\nLogging out... \nReturning to Main Menu...")
+                    print("\n\033[33mLogging out... \nReturning to Main Menu...\033[0m")
                     self.main_menu()
                 else:
                     print("\n\033[31mSorry, invalid option. Please try again.\033[0m")
