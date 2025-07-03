@@ -12,6 +12,8 @@ class Store():
         self.user_file = config.user_files
         self.users = self.load_users()
         self.current_user = None
+
+        self.cart = {}
         self.catalog = Catalog(self)
         self.admin = Admin(self.catalog.catalog)
 
@@ -84,7 +86,7 @@ class Store():
         print("\t3. Exit")
 
         # Get User Choice
-        choice = input("\n\033[1mEnter your choice: \033[0m")
+        choice = input("\n\033[1m 👉 Enter your choice: \033[0m")
         if choice == "1":
             self.login()
         elif choice == "2":
@@ -101,50 +103,33 @@ class Store():
 
         print(f'\n\033[1;95m---------- {role.title()} Menu Page ----------\033[0m\n')
         if role == "user":
-            print("\t1. View Catalog")
-            print("\t2. Search")
-            print("\t3. Filter")
-            print("\t4. Add to Cart")
-            print("\t5. Checkout")
-            print("\t6. Purchase History")
-            print("\t7. Return Item")
-            print("\t8. Logout")
+            print("\t1. 🧾 View Catalog")
+            print("\t2. 🕓 Purchase History")
+            print("\t3. 🛒 View Cart")
+            print("\t4. 🔁 Return Item")
+            print("\t5. 🚪 Logout")
 
             # Get User Choice
-            choice = input("\n\033[1mEnter your choice: \033[0m")
+            choice = input("\n\033[1m 👉 Enter your choice: \033[0m")
             if choice == "1":
                 self.catalog.view_catalog()
                 # After Viewing Catalog, Return back to User Menu
                 self.user_menu()
             elif choice == "2":
-                self.catalog.search_product()
-                # After Searching in Catalog, Return back to User Menu
-                self.user_menu()
-            elif choice == "3":
-                self.catalog.filter_products()
-                # After Filtering Products, Return back to User Menu
-                self.user_menu()
-            elif choice == "4":
-                self.catalog.add_to_cart()
-                # After Add product to the cart, Return back to User Menu
-                self.user_menu()
-            elif choice == "5":
-                self.catalog.checkout()
-                # After Checkout, Return back to the User Menu
-                self.user_menu()
-            elif choice == "6":
                 self.catalog.view_purchase_history()
                 # After Save details to purchase history, Return back to the User Menu
                 self.user_menu()
-            elif choice == "7":
+            elif choice == "3":
+                self.catalog.view_cart()
+            elif choice == "4":
                 self.catalog.return_items()
                 # After Returning Items, Return back to the User Menu
                 self.user_menu()
-            elif choice == "8":
-                print("\n\033[33mLogging out... \nReturning to Main Menu...\033[0m")
+            elif choice == "5":
+                print("\n\033[33m👋 Logging out... \nReturning to Main Menu...\033[0m")
                 self.main_menu()
             else:
-                print("\n\033[31mSorry, invalid option. Please try again.\033[0m")
+                print("\n\033[31m❌ Sorry, invalid option. Please try again.\033[0m")
             self.user_menu()
 
         elif role == "admin":
@@ -159,7 +144,7 @@ class Store():
                 print("8. Monitor Stock")
                 print("9. Logout")
 
-                admin_choice = input("\n\033[1mEnter your choice: \033[0m")
+                admin_choice = input("\n\033[1m 👉 Enter your choice: \033[0m")
                 if admin_choice == "1":
                     self.admin.add_users()
                 elif admin_choice == "2":
@@ -177,10 +162,10 @@ class Store():
                 elif admin_choice == "8":
                     self.admin.monitor_stock()
                 elif admin_choice == "9":
-                    print("\n\033[33mLogging out... \nReturning to Main Menu...\033[0m")
+                    print("\n\033[33m👋 Logging out... \nReturning to Main Menu...\033[0m")
                     self.main_menu()
                 else:
-                    print("\n\033[31mSorry, invalid option. Please try again.\033[0m")
+                    print("\n\033[31m❌ Sorry, invalid option. Please try again.\033[0m")
                 self.user_menu()
 
 if __name__ == "__main__":

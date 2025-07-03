@@ -14,7 +14,7 @@ class Catalog():
         ]
 
         self.purchase_history = config.purchase_history_file
-        self.cart = {}
+        self.store.cart
 
     # View Catalog
     def view_catalog(self):
@@ -28,28 +28,31 @@ class Catalog():
             sizes = ", ".join(item['sizes'])
             print(f"{item['id']:<5} {item['name']:<10} Ұ{item['price']:<10.2f} {sizes:<12} {item['stock']:<6}")
 
-        print("\n===============================================")
-        print("\n\t1. Add to cart")
-        print("\t2. Checkout")
-        print("\t3. Back to User Menu")
-        print("\t4. Exit")
+        print("-" * 50)
+        print("\n\t1. 🔍 Search Product")
+        print("\t2. 🧃 Filter Products")
+        print("\t3. ➕ Add to Cart")
+        print("\t4. 🔙 Back to Menu")
 
         # Get user Selection
-        user_choice = input("\n\033[1mEnter your choice: \033[0m")
+        user_choice = input("\n\033[1m 👉 Enter your choice: \033[0m")
 
         if user_choice == "1":
-            self.add_to_cart()
+            self.search_product()
         elif user_choice == "2":
-            self.checkout()
+            self.filter_products()
         elif user_choice == "3":
-            self.store.user_menu()
+            self.add_to_cart()
+            checkout_now = input("\n🛒 Proceed to checkout now? (y/n): ").strip().lower()
+            if checkout_now == 'y':
+                self.checkout()
         elif user_choice == "4":
-            self.store.exit_page()
+            self.store.user_menu()
 
     # Searching Products
     def search_product(self):
         print("\n\033[1;95m---------- Search Product Page ----------\033[0m\n")
-        keyword =input("\033[1mEnter keyword to search: \033[0m").lower()
+        keyword =input("\033[1mEnter keyword: \033[0m").lower()
 
         found=False
         for item in self.catalog:
@@ -62,11 +65,11 @@ class Catalog():
     # Fitering Products by Size and Price
     def filter_products(self):
         print("\n\033[1;95m---------- Filter Products ----------\033[0m\n")
-        print("\t1. Filter Products by Size")
-        print("\t2. Filter Products by Price")
-        print("\t3. Back to User Menu")
+        print("\t1. 📏 Filter by Size")
+        print("\t2. 💰 Filter by Price")
+        print("\t3. 🔙 Back to Menu")
 
-        user_filter_option = input("\n\033[1mEnter your choice: \033[0m")
+        user_filter_option = input("\n\033[1m 👉 Enter your choice: \033[0m")
 
         # Filter Products by Size
         if user_filter_option == "1":
@@ -107,6 +110,7 @@ class Catalog():
             print("\n\033[31mInvalid Choice. Please try again...\033[0m")
             self.filter_products()
 
+
     # Add Items to the Cart
     def add_to_cart(self):
         print("\n\033[1;95m----------  🛒 Add to cart 🛒  ----------\033[0m")
@@ -126,7 +130,7 @@ class Catalog():
                 print("\n\033[31mSorry! Requested quantity exceeds available stock.\033[0m")
                 return
             else:
-                self.cart[selected_item_id] = {
+                self.store.cart[selected_item_id] = {
                     'quantity': quantity,
                     'product': product
                 }
@@ -136,17 +140,17 @@ class Catalog():
             print("\n\033[31mInvalid input. Please try again...\033[0m")
             #print(f'Successfully added {quantity} x {item} to your cart!')
 
-    # Checkout
-    def checkout(self):
-        print("\n\033[1;95m---------- Checkout Page ----------\033[0m\n")
-        if not self.cart:
+    # View Cart
+    def view_cart(self):
+        print("\n\033[1;95m---------- Your Cart ----------\033[0m\n")
+        if not self.store.cart:
             print("\n\033[31mYour Cart is empty. Add some items first!\033[0m")
             return
 
         total_value = 0
         print("\033[1mItems in your cart: \033[0m")
 
-        for item_id, cart_item in self.cart.items():
+        for item_id, cart_item in self.store.cart.items():
             product = cart_item['product']
             quantity = cart_item['quantity']
             price = product['price']
@@ -156,19 +160,31 @@ class Catalog():
 
         print(f'\n\033[32mYour Total Amount : Ұ{total_value:.2f}\033[0m')
 
-        confirm_checkout = input("\n\033[1mWould you like to proceed to checkout? (Y/N): \033[0m").lower()
+        proceed_to_checkout = input("\n\033[1mProceed to checkout? (y/n): \033[0m").strip().lower()
 
-        if confirm_checkout == "y":
+        if proceed_to_checkout == "y":
+            self.checkout()
+        else:
+            print("\n\033[33mReturning to Catalog...\033[0m")
+
+    # Checkout
+    def checkout(self):
+        print("\n\033[1;95m---------- Checkout Page ----------\033[0m\n")
+        if not self.store.cart:
+            print("\n\033[31mYour Cart is empty. Add some items first!\033[0m")
+            return
+
+        if self.store.cart:
             # Deduct from the Stock
-            for item_id, cart_item in self.cart.items():
+            for item_id, cart_item in self.store.cart.items():
                 product = cart_item['product']
                 quantity = cart_item['quantity']
                 product['stock'] -= quantity
 
             #Save to History
-            self.save_purchase_history(self.cart)
+            self.save_purchase_history(self.store.cart)
 
-            self.cart.clear()
+            self.store.cart.clear()
             print("\n\033[34mYour Order Successful! Thank you for your purchase.\033[0m")
         else:
             print("\n\033[31mCheck out Cancelled.\033[0m")
