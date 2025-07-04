@@ -1,0 +1,75 @@
+[
+    {
+        "id": 1,
+        "name": "T-Shirt",
+        "price": 2500.0,
+        "sizes": [
+            "S",
+            "M",
+            "L"
+        ],
+        "stock": 10
+    },
+    {
+        "id": 2,
+        "name": "Jeans",
+        "price": 4890.0,
+        "sizes": [
+            "M",
+            "L",
+            "XL"
+        ],
+        "stock": 5
+    },
+    {
+        "id": 3,
+        "name": "Jacket",
+        "price": 7600.0,
+        "sizes": [
+            "M",
+            "L"
+        ],
+        "stock": 3
+    },
+    {
+        "id": 4,
+        "name": "Skirt",
+        "price": 2650.0,
+        "sizes": [
+            "XS",
+            "S",
+            "M"
+        ],
+        "stock": {
+            "XS": 12,
+            "S": 10,
+            "M": 5
+        }
+    },
+    {
+        "id": 5,
+        "name": "Skirt",
+        "price": 2450.0,
+        "sizes": [
+            "XS",
+            "S",
+            "M"
+        ],
+        "stock": {
+            "XS": 12,
+            "S": 5,
+            "M": 6
+        }
+    },
+    {
+        "id": 6,
+        "name": "Pant",
+        "price": 4300.0,
+        "sizes": [
+            "S"
+        ],
+        "stock": {
+            "S": 15
+        }
+    }
+]

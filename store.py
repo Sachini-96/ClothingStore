@@ -39,28 +39,28 @@ class Store():
 
     # Login Function
     def login(self):
-        print("\n\033[1;95m---------- Login Page ----------\033[0m")
-        username = input("\n\033[1mPlease enter your Username: \033[0m")
-        password = input("\033[1mPlease enter your Password: \033[0m")
+        print("\n\033[1;95m---------- 🔓 Login Page ----------\033[0m")
+        username = input("\n\033[1m 👤 Username: \033[0m")
+        password = input("\033[1m 🔑 Password: \033[0m")
 
         user = self.users.get(username)
         if user and user['password'] == password:
-            print(f'\n\033[34mWelcome {username}! You are now logged in.\033[0m')
+            print(f'\n\033[34m ✅ Welcome {username}! You are now logged in.\033[0m')
             self.current_user = {"username": username, "role": user['role']}
             self.user_menu()
         else:
-            print("\n\033[31mInvalid Username or Password. Please try again!\033[0m")
+            print("\n\033[31m ❌ Invalid Username or Password. Please try again!\033[0m")
 
     # Register New User Function
     def register_new_user(self):
-        print("\n\033[1;95m---------- Register Page ----------\033[0m")
-        username = input("\n\033[1mEnter Username : \033[0m")
+        print("\n\033[1;95m---------- 📝 Register Page ----------\033[0m")
+        username = input("\n\033[1m 👤 Enter Username : \033[0m")
 
         if username in self.users:
-            print("\n\033[31mUsername Already Exists.\033[0m")
+            print("\n\033[31m ❌ Username Already Exists.\033[0m")
             return
 
-        password = input("\033[1;34mEnter Password: \033[0m")
+        password = input("\033[1;34m 🔑 Enter Password: \033[0m")
 
         self.users[username] = {
             "password": password,
@@ -69,7 +69,7 @@ class Store():
         }
         self.save_users()
 
-        print(f'\nUser "{username}" registered successfully.')
+        print(f'\n ✅ User "{username}" registered successfully.')
         self.login()
 
     # Exit from the Page Function
@@ -94,7 +94,7 @@ class Store():
         elif choice == "3":
             self.exit_page()
         else:
-            print("\n\033[31mSorry, invalid option. Please try again.\033[0m")
+            print("\n\033[31m ❌ Sorry, invalid option. Please try again.\033[0m")
             self.main_menu()
 
     # Display User Menu After Logged in
@@ -134,15 +134,15 @@ class Store():
 
         elif role == "admin":
             while True:
-                print("1. Add Users")
-                print("2. View User Details")
-                print("3. Add Product")
-                print("4. Edit Catalog")
-                print("5. Delete Catalog")
-                print("6. View Catalog")
-                print("7. View Catalog Insight")
-                print("8. Monitor Stock")
-                print("9. Logout")
+                print("1. 👥 Add Users")
+                print("2. 📋 View User Details")
+                print("3. ➕ Add Product")
+                print("4. ✏️ Edit Catalog")
+                print("5. 🗑️ Delete Items")
+                print("6. 🛍️ View Catalog")
+                print("7. 📊 View Catalog Insight")
+                print("8. 📦 Monitor Stock")
+                print("9. 🚪 Logout")
 
                 admin_choice = input("\n\033[1m 👉 Enter your choice: \033[0m")
                 if admin_choice == "1":

@@ -58,5 +58,16 @@
                 "quantity": 1
             }
         ]
+    },
+    {
+        "timestamp": "07/04/2025 08:38:15 PM",
+        "type": "purchase",
+        "items": [
+            {
+                "name": "T-Shirt",
+                "price": 2500.0,
+                "quantity": 2
+            }
+        ]
     }
 ]
