@@ -1,4 +1,6 @@
 from datetime import datetime
+from itertools import product
+
 from config import catalog_file
 import json
 import os
@@ -17,9 +19,9 @@ class Catalog():
         if not os.path.exists(self.catalog_file):
             # Create default catalog
             default_catalog = [
-                {"id": 1, "name": "T-Shirt", "price": 2500.0, "sizes": ["S", "M", "L"], "stock": 10},
-                {"id": 2, "name": "Jeans", "price": 4890.0, "sizes": ["M", "L", "XL"], "stock": 5},
-                {"id": 3, "name": "Jacket", "price": 7600.0, "sizes": ["M", "L"], "stock": 3}
+                {"id": 1, "name": "T-Shirt", "price": 2500.00, "sizes": ["S", "M", "L"], "stock": {"S": 3, "M": 4, "L": 3}},
+                {"id": 2, "name": "Jeans", "price": 4890.00, "sizes": ["M", "L", "XL"], "stock": {"M": 2, "L": 2, "XL": 1}},
+                 {"id": 3, "name": "Jacket", "price": 7600.00, "sizes": ["M", "L"], "stock": {"M": 1, "L": 2}},
             ]
             with open(catalog_file, "w") as f:
                 json.dump(default_catalog, f, indent=4)
@@ -35,10 +37,10 @@ class Catalog():
 
     # View Catalog
     def view_catalog(self):
-        print("\n\033[1;95m---------- 🧾 Catalog ----------\033[0m\n")
+        print("\n\033[1;95m-------------------- 🧾 Catalog --------------------\033[0m\n")
 
         # Print header
-        print(f"\033[1m{'ID':<5} {'Name':<10} {'Price (Ұ)':<12} {'Sizes':<12} {'Stock':<6}\033[0m")
+        print(f"\033[1m{'ID':<5} {'Name':<10} {'Price (Ұ)':<12} {'Sizes':<15} {'Stock':<6}\033[0m")
         print("-" * 50)
 
         for item in self.catalog:
@@ -50,7 +52,7 @@ class Catalog():
             else:
                 total_stock = stock_value
 
-            print(f"{item['id']:<5} {item['name']:<10} Ұ{item['price']:<10.2f} {sizes:<12} {total_stock:<6}")
+            print(f"{item['id']:<5} {item['name']:<10} Ұ{item['price']:<10,.2f} {sizes:<12} {total_stock:<6}")
 
         print("-" * 50)
         print("\n\t1. 🔍 Search Product")
@@ -70,69 +72,77 @@ class Catalog():
             checkout_now = input("\n🛒 Proceed to checkout now? (y/n): ").strip().lower()
             if checkout_now == 'y':
                 self.checkout()
+                return
+            elif checkout_now == 'n':
+                print("\n\033[33mCheckout cancelled. Returning to Catalog menu...\033[0m")
+            else:
+                print("\n\033[31mInvalid input. Returning to Catalog menu...\033[0m")
         elif user_choice == "4":
-            self.store.user_menu()
+            return
 
     # Searching Products
     def search_product(self):
         print("\n\033[1;95m---------- 🔍 Search Product Page ----------\033[0m\n")
-        keyword =input("\033[1mEnter keyword: \033[0m").lower()
+        keyword = input("\033[1mEnter keyword: \033[0m").lower()
 
-        found=False
+        found = False
         for item in self.catalog:
             if keyword in item['name'].lower():
-                print(f'\n{item['id']}: {item["name"]} - Ұ{item['price']} | Sizes: {', '.join(item['sizes'])} | Stock: {item['stock']}')
-                found=True
+                print(f"\n{item['id']}: {item['name']} - Ұ{item['price']:,.2f} | Sizes: {', '.join(item['sizes'])} | Stock: {item['stock']}")
+                found = True
         if not found:
             print("\n\033[31m ❌ No Matching Products Found...\033[0m")
 
+        self.view_catalog()
+
     # Fitering Products by Size and Price
     def filter_products(self):
-        print("\n\033[1;95m---------- 🧃 Filter Products ----------\033[0m\n")
-        print("\t1. 📏 Filter by Size")
-        print("\t2. 💰 Filter by Price")
-        print("\t3. 🔙 Back to Menu")
+        while True:
+            print("\n\033[1;95m---------- 🧃 Filter Products ----------\033[0m\n")
+            print("\t1. 📏 Filter by Size")
+            print("\t2. 💰 Filter by Price")
+            print("\t3. 🔙 Back to Menu")
 
-        user_filter_option = input("\n\033[1m 👉 Enter your choice: \033[0m")
+            user_filter_option = input("\n\033[1m 👉 Enter your choice: \033[0m")
 
-        # Filter Products by Size
-        if user_filter_option == "1":
-            print("\n\033[1;95m---------- Filter Products by Size ----------\033[0m")
-            user_entered_size = input("\n\033[1mEnter the size for filter items: \033[0m").upper()
-            print()
-
-            found = False
-            for item in self.catalog:
-                if user_entered_size in item['sizes']:
-                    print(f'{item['id']}: {item['name']} - Ұ{item['price']} | Sizes: {', '.join(item['sizes'])} | Stock: {item["stock"]}')
-                    found = True
-            if not found:
-                print("\033[31m ❌ No products found for given size...\033[0m")
-
-        # Filter Products by Price+
-        elif user_filter_option == "2":
-            print("\n\033[1;95m---------- Filter Products by Price ----------\033[0m")
-            try:
-                user_entered_min_price = float(input("\n\033[1mEnter the Minimum price for filter items: \033[0m"))
-                user_entered_max_price =float(input("\033[1mEnter the Maximum price for filter items: \033[0m"))
+            # Filter Products by Size
+            if user_filter_option == "1":
+                print("\n\033[1;95m---------- Filter Products by Size ----------\033[0m")
+                user_entered_size = input("\n\033[1mEnter the size for filter items: \033[0m").upper()
                 print()
 
                 found = False
                 for item in self.catalog:
-                    if user_entered_min_price <= item['price'] <= user_entered_max_price:
-                        print(f'{item['id']}: {item['name']} - Ұ{item['price']} | Sizes: {', '.join(item['sizes'])} | Stock: {item["stock"]}')
+                    if user_entered_size in item['sizes']:
+                        print(f"{item['id']}: {item['name']} - Ұ{item['price']:,.2f} | Sizes: {', '.join(item['sizes'])} | Stock: {item['stock']}")
                         found = True
                 if not found:
-                    print("\n\033[31m ❌ No products found for given price...\033[0m")
-            except ValueError:
-                print("\n\033[31m ❌ Invalid input. Please try again...\033[0m")
+                    print("\033[31m ❌ No products found for given size...\033[0m")
 
-        # Back to User Menu
-        elif user_filter_option == "3":
-            self.store.user_menu()
-        else:
-            print("\n\033[31m ❌ Invalid Choice. Please try again...\033[0m")
-            self.filter_products()
+            # Filter Products by Price+
+            elif user_filter_option == "2":
+                print("\n\033[1;95m---------- Filter Products by Price ----------\033[0m")
+                try:
+                    user_entered_min_price = float(input("\n\033[1mEnter the Minimum price for filter items: \033[0m"))
+                    user_entered_max_price =float(input("\033[1mEnter the Maximum price for filter items: \033[0m"))
+                    print()
+
+                    found = False
+                    for item in self.catalog:
+                        if user_entered_min_price <= item['price'] <= user_entered_max_price:
+                            print(f"{item['id']}: {item['name']} - Ұ{item['price']:,.2f} | Sizes: {', '.join(item['sizes'])} | Stock: {item['stock']}")
+                            found = True
+                    if not found:
+                        print("\n\033[31m ❌ No products found for given price...\033[0m")
+                except ValueError:
+                    print("\n\033[31m ❌ Invalid input. Please try again...\033[0m")
+
+            # Back to User Menu
+            elif user_filter_option == "3":
+                return
+            else:
+                print("\n\033[31m ❌ Invalid Choice. Please try again...\033[0m")
+                self.filter_products()
 
 
     # Add Items to the Cart
@@ -140,29 +150,44 @@ class Catalog():
         print("\n\033[1;95m----------  ➕ Add to cart  ----------\033[0m")
         try:
             selected_item_id = int(input("\n\033[1mEnter ID of the item you want to add: \033[0m"))
-            quantity = int(input("\033[1mEnter the quantity: \033[0m"))
 
             product = next((item for item in self.catalog if item['id'] == selected_item_id), None)
 
-            # No product available for the user entered ID
             if not product:
                 print("\n\033[31m ❌ No product found for given ID...\033[0m")
                 return
 
-            # Out of Stock
-            if quantity > product['stock']:
+            print(f"Available Sizes: {', '.join(product['sizes'])}")
+            selected_size = input("\n\033[1mEnter Size: \033[0m").strip().upper()
+
+            if not isinstance(product['stock'], dict):
+                print("\n\033[31m ❌ Error: Stock format invalid for this product!\033[0m")
+                return
+
+            if selected_size not in product['stock']:
+                print("\n\033[31m ❌ Selected size is not available in stock!\033[0m")
+                return
+
+            available_stock = product['stock'].get(selected_size, 0)
+            quantity = int(input("\033[1mEnter quantity: \033[0m"))
+
+            if quantity > available_stock:
                 print("\n\033[31m ❌ Sorry! Requested quantity exceeds available stock.\033[0m")
                 return
-            else:
-                self.store.cart[selected_item_id] = {
-                    'quantity': quantity,
-                    'product': product
-                }
-            print(f'\n\033[34m ✅ Successfully added {quantity} x {product['name']} to cart.\033[0m')
+
+            #product['stock'][selected_size] -= quantity
+
+            self.store.cart[(selected_item_id, selected_size)] = {
+                'quantity': quantity,
+                'product': product,
+                'size': selected_size
+            }
+
+            print(
+                f'\n\033[34m ✅ Successfully added {quantity} x {product["name"]} (Size {selected_size}) to cart.\033[0m')
 
         except ValueError:
             print("\n\033[31m ❌ Invalid input. Please try again...\033[0m")
-            #print(f'Successfully added {quantity} x {item} to your cart!')
 
     # View Cart
     def view_cart(self):
@@ -180,7 +205,7 @@ class Catalog():
             price = product['price']
             subtotal = price * quantity
             total_value += subtotal
-            print(f'{product['name']} x {quantity} = Ұ{subtotal:.2f}')
+            print(f"{product['name']} x {quantity} = Ұ{subtotal:,.2f}")
 
         print(f'\n\033[32mYour Total Amount : Ұ{total_value:.2f}\033[0m')
 
@@ -188,8 +213,13 @@ class Catalog():
 
         if proceed_to_checkout == "y":
             self.checkout()
+            return
+        elif proceed_to_checkout == "n":
+            print("\n\033[33mCheckout Cancelled... \033[0m")
+            return
         else:
-            print("\n\033[33mReturning to Catalog...\033[0m")
+            print("\n\033[31m Invalid input. Please enter 'y' or 'n'.\033[0m")
+
 
     # Checkout
     def checkout(self):
@@ -198,11 +228,17 @@ class Catalog():
             print("\n\033[31m ❌ Your Cart is empty. Add some items first!\033[0m")
             return
 
-        if self.store.cart:
+        for(item_id, size), cart_item in list(self.store.cart.items()):
             # Deduct from the Stock
-            for item_id, cart_item in self.store.cart.items():
-                product = cart_item['product']
-                quantity = cart_item['quantity']
+            product = cart_item['product']
+            quantity = cart_item['quantity']
+
+            if isinstance(product['stock'], dict):
+                if size in product['stock']:
+                    product['stock'][size] -= quantity
+                else:
+                    print(f"\n\033[31m ❌ Error: Size {size} is notfound in stock!\033[0m")
+            else:
                 product['stock'] -= quantity
 
             #Save to History
@@ -210,8 +246,6 @@ class Catalog():
 
             self.store.cart.clear()
             print("\n\033[34m ✅ Your Order Successful! Thank you for your purchase.\033[0m")
-        else:
-            print("\n\033[31mCheck out Cancelled.\033[0m")
 
     def save_purchase_history(self, cart):
         history = []
@@ -231,7 +265,8 @@ class Catalog():
                 {
                     "name": item['product']['name'],
                     "price": item['product']['price'],
-                    "quantity": item['quantity']
+                    "quantity": item['quantity'],
+                    "size": item['size']
                 } for item in cart.values()
             ]
         }
@@ -261,9 +296,9 @@ class Catalog():
 
         for record in history:
             label = record.get("type", "purchase").capitalize()
-            print(f'{label} - Date: {record["timestamp"]}')
+            print(f"{label} - Date: {record['timestamp']}")
             for item in record['items']:
-                print(f' - {item["name"]} x {item["quantity"]} @ Ұ{item["price"]:.2f}')
+                print(f" - {item['name']} x {item['quantity']} @ Ұ{item['price']:,.2f}")
             print()
 
     # Return Items
@@ -290,12 +325,12 @@ class Catalog():
         all_items = []
         print("\033[1mYour Purchase History: \n\033[0m")
         for i,record in enumerate(history):
-            print(f'{i + 1}. Date : {record["timestamp"]}')
+            print(f"{i + 1}. Date : {record['timestamp']}")
             for j,item in enumerate(record['items']):
                 index = len(all_items)
                 #Record index + item
                 all_items.append((i, item))
-                print(f' [{index}] {item['name']} x {item["quantity"]} @ Ұ{item["price"]:.2f}')
+                print(f" [{index}] {item['name']} x {item['quantity']} @ Ұ{item['price']:,.2f}")
         print()
 
         # Select Item to Return
@@ -312,6 +347,7 @@ class Catalog():
         record_index, item_to_return = all_items[return_index]
         item_name = item_to_return['name']
         item_quantity = item_to_return['quantity']
+        item_size = item_to_return.get('size', None)
 
         # Ask Return Quantity
         try:
@@ -326,11 +362,17 @@ class Catalog():
         # Update Stock
         for product in self.catalog:
             if product['name'] == item_name:
-                product['stock'] += return_quantity
+                if isinstance(product['stock'], dict) and item_size in product['stock']:
+                    product['stock'][item_size] += return_quantity
+                else:
+                    #product['stock'] += return_quantity
+                    print("\n\033[31m ❌ Size mismatch or stock format invalid.\033[0m")
+                    return
                 break
-        else:
-            print("\n\033[31m ❌ Return item not found in catalog.\033[0m")
-            return
+            else:
+                # This executes only if for loop complete without break
+                print("\n\033[31m ❌ Returned item not found in catalog.\033[0m")
+                return
 
         # Adjust Purchase Record
         if return_quantity == item_quantity:

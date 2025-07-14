@@ -24,7 +24,7 @@ class Admin:
         print("\n\033[1;36m---------- 👥 Add New Users Page ----------\033[0m")
         username = input("\n\033[1mEnter Username: \033[0m").strip()
         if username in self.users:
-            print("\n\033[31m ❌ Username already exists!")
+            print("\n\033[31m ❌ Username already exists!\033[0m\n")
             return
 
         password = input("\033[1mEnter Password: \033[0m").strip()
@@ -38,7 +38,7 @@ class Admin:
         elif role_input == "2":
             role = "user"
         else:
-            print("\n\033[31m ❌ Invalid Role Selected. Only 'admin' or 'user' Allowed.\033[0m")
+            print("\n\033[31m ❌ Invalid Role Selected. Only 'admin' or 'user' Allowed.\033[0m\n")
             return
 
         self.users[username] = {
@@ -47,7 +47,7 @@ class Admin:
             "registered_date": datetime.now().strftime("%m/%d/%Y %I:%M:%S %p")
         }
         self.save_users()
-        print(f'\n\033[34m ✅ User {username} with "{role}" role has been added successfully!\033[0m')
+        print(f'\n\033[34m ✅ User {username} with "{role}" role has been added successfully!\033[0m\n')
 
     def view_registered_users(self):
         print("\n\033[1;36m---------- 📋 Registered Users Page ----------\033[0m\n")
@@ -65,7 +65,7 @@ class Admin:
 
         for username, details in self.users.items():
             reg_date = details.get("registered_date", "-")
-            print(f'Username: {username}  |  Role: {details["role"]}  |  Registered Date: {reg_date} ')
+            print(f'Username: {username}  |  Role: {details["role"]}  |  Registered Date: {reg_date} \n')
 
     def add_products(self):
         print("\n\033[1;36m---------- ➕ Add New Products ----------\033[0m\n")
@@ -112,15 +112,29 @@ class Admin:
                 return
 
             print(f'\033[32mEditing {product["name"]}...\n\033[0m')
-            name = input(f'\033[1mName ({product['name']}): \033[0m') or product["name"]
-            price_input = input(f'\033[1mPrice ({product["price"]}): \033[0m')
-            price = float(price_input) if (price_input) else product["price"]
-            sizes_input = input(f'\033[1mSizes (comma-seperated): \033[0m')
-            sizes = [s.strip().upper() for s in sizes_input.split(',')] if sizes_input else product["sizes"]
-            stock_input = input(f'\033[1mQuantity ({product["stock"]}): \033[0m')
-            stock = int(stock_input) if (stock_input) else product["stock"]
+            name = input(f"\033[1mName ({product['name']}): \033[0m") or product["name"]
 
-            product.update({"name": name, "price": price, "sizes": sizes, "stock": stock})
+            price_input = input(f"\033[1mPrice ({product["price"]}): \033[0m")
+            price = float(price_input) if (price_input) else product["price"]
+
+            sizes_input = input(f"\033[1mSizes (comma-seperated):\033[0m").lower() or product['sizes']
+            sizes = [size.strip().upper() for size in sizes_input.split(',')] if sizes_input else product["sizes"]
+
+            #stock_input = input(f"\033[1mQuantity ({product["stock"]}): \033[0m")
+            #stock = int(stock_input) if (stock_input) else product["stock"]
+            quantity_by_size = {}
+            print("\033[1mEnter quantity for each size: \033[0m")
+            for size in sizes:
+                quantity = input(f"\033[1m Enter Product Quantity for size {size.upper()}: \033[0m")
+                while not quantity.isdigit():
+                    print("\n\033[31m ❌ Please enter valid number.\n\033[0m")
+                    quantity = input(f"\033[1m Enter Product Quantity for size {size.upper()}: \033[0m")
+                quantity_by_size[size] = int(quantity)
+
+            product['sizes'] = sizes
+            product['stock'] = quantity_by_size
+
+            product.update({"name": name, "price": price, "sizes": sizes, "stock": quantity_by_size})
             print("\n\033[34m ✅ Product Updated Successfully.\033[0m\n")
 
         except ValueError:
@@ -142,7 +156,7 @@ class Admin:
             confirm = input(f'\n\033[1mAre you sure you want to delete "{self.catalog[indx]['name']}"? (Y/N): \033[0m'.lower())
             if confirm == 'y':
                 removed = self.catalog.pop(indx)
-                print(f'\033[34m" ✅ {removed["name"]}" Deleted Successfully.\033[0m\n')
+                print(f'\n\033[34m✅ " {removed["name"]}" Deleted Successfully.\033[0m\n')
             else:
                 print("\n\033[31mProduct delete Cancelled.\033[0m\n")
         except ValueError:
@@ -154,14 +168,24 @@ class Admin:
 
     # Catalog Insights - for Admin users
     def view_catalog_insights(self):
-        print("\n\033[1;36m---------- 📊 Catalog Insights Page ----------\033[0m\n")
+        print("\n\033[1;36m---------- 📊 Catalog Insights Page ----------\033[0m")
         total_items = len(self.catalog)
-        total_stock = sum(sum(stock.values()) if isinstance(stock := item['stock'], dict) else stock for item in self.catalog)
-        total_value = sum(sum(stock.values()) if isinstance(stock := item['stock'], dict) else stock for item in self.catalog)
+
+        # Calculate total stock units
+        total_stock = sum(
+            sum(item['stock'].values()) if isinstance(item['stock'], dict) else item['stock']
+            for item in self.catalog
+        )
+
+        # Calculate total inventory value = sum of (price * total quantity per product)
+        total_value = sum(
+            item['price'] * (sum(item['stock'].values()) if isinstance(item['stock'], dict) else item['stock'])
+            for item in self.catalog
+        )
 
         print(f'\n\033[1mTotal Products:  {total_items}\033[0m')
         print(f'\033[1mTotal Stock Units: {total_stock}\033[0m')
-        print(f'\033[1mTotal Inventory Value: Ұ{total_value:.2f}\033[0m\n')
+        print(f'\033[1mTotal Inventory Value: Ұ{total_value:,.2f}\033[0m\n')
 
     # Monitor Stock - for Admin User
     def monitor_stock(self):
@@ -169,8 +193,14 @@ class Admin:
         low_stock_threshold = 3
 
         for item in self.catalog:
-            status = "\033[31m ⚠️ Low Stock!!!\033[0m" if item['stock'] <= low_stock_threshold else "\033[32m ✅ Enough Stock Available\033[0m"
-            print(f"{item['name']} | Stock {item['stock']} →  {status}")
+            stock = item['stock']
+            if isinstance(stock, dict):
+                total_stock = sum(stock.values())
+            else:
+                total_stock = stock
+
+            status = "\033[31m ⚠️ Low Stock!!!\033[0m" if total_stock <= low_stock_threshold else "\033[32m ✅ Enough Stock Available\033[0m"
+            print(f"{item['name']} | Total Stock {total_stock} →  {status}")
 
     # Save Catalog
     def save_catalog(self):
